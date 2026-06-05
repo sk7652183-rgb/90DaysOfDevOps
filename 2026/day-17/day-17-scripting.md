@@ -38,10 +38,6 @@ If no argument was passed, printed "Usage: ./greet.sh
 
 Created args_demo.sh that:
 
-Printed the total number of arguments ($#).
-Printed all arguments ($@).
-Printed the script name ($0).
-
 <img width="1862" height="1043" alt="image" src="https://github.com/user-attachments/assets/62b357d3-be95-4e08-a8cf-d4d0035c3f9d" />
 
 ****Task 4: Install Packages via Script****************
