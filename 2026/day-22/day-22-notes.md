@@ -156,7 +156,9 @@ nothing to commit, working tree clean
 What it does (1 line)
 An example of how to use it
 
-[Basic Workflow](git-cheatsheet.md#basic-workflow)
+## Related Documents
+
+- [Git Commands Cheat Sheet](git-commands.md)
 
 ## Task 5: Make More Changes and Build History
 
