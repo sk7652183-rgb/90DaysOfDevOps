@@ -12,7 +12,7 @@ chmod +x script.sh adds execute permission to the script, allowing it to be run 
 
 Comments — single line (#) and inline
 
-# is used to create a single-line comment in a shell script. Comments are ignored by the shell during execution and are used to explain the code or add notes for readability.
+is used to create a single-line comment in a shell script. Comments are ignored by the shell during execution and are used to explain the code or add notes for readability.
 
 
 Variables — declaring, using, and quoting ($VAR, "$VAR", '$VAR')
