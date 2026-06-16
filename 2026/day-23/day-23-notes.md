@@ -8,8 +8,6 @@ A Git branch is a separate line of development that allows developers to work on
 
 ### Why do we use branches instead of committing everything to main?
 
-### Why do we use branches instead of committing everything to main?
-
 Branches are used for separate development and isolated work. Committing everything directly to the main branch can introduce bugs or unstable changes that may affect the application. Branches help keep the main branch stable and safe.
 
 ### What is HEAD in Git?
