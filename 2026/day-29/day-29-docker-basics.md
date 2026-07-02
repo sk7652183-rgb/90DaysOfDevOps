@@ -38,9 +38,8 @@ Docker follows a client-server architecture and consists of the following compon
 
 ## Docker Architecture
 
-<p align="center">
-  <img src="./images/docker-architecture.png" alt="Docker Architecture Diagram" width="900">
-</p>
+<img width="1505" height="998" alt="image" src="https://github.com/user-attachments/assets/e74ecbe3-69e2-4a1c-8845-5d094df3c346" />
+
 
 ### Architecture Flow
 
