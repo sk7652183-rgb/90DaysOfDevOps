@@ -408,6 +408,7 @@ sufiyan@Khan:~/DevOps/portfolio$
 
 ### Task 5: .dockerignore
 
+```bash
 sufiyan@Khan:~/DevOps/portfolio$ docker build -t my-app .
 [+] Building 2.4s (9/9) FINISHED                                                                                                                                         docker:default
  => [internal] load build definition from Dockerfile                                                                                                                               0.0s
@@ -440,7 +441,7 @@ total 8
 drwxr-xr-x    2 root     root          4096 Jul  8 09:51 .
 drwxr-xr-x    1 root     root          4096 Jul  8 10:50 ..
 /app # 
-
+```
 
 The files and directories specified in the .dockerignore file are excluded from the Docker build context, resulting in a smaller and faster image build.
 
