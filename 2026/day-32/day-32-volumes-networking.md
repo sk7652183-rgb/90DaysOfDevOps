@@ -1323,4 +1323,122 @@ ubuntu@ip-172-31-7-134:~$ docker inspect -f '{{range $k, $v := .NetworkSettings.
 test_network
 ubuntu@ip-172-31-7-134:~$
 ```
-### 
+### Run an application container (using any image) on the same custom network and verify that it can communicate with the database container using its container name.
+```bash 
+ubuntu@ip-172-31-7-134:~$ docker ps
+CONTAINER ID   IMAGE          COMMAND                  CREATED       STATUS       PORTS                 NAMES
+7eed0b48bdda   mysql:latest   "docker-entrypoint.s…"   5 hours ago   Up 5 hours   3306/tcp, 33060/tcp   Database_container
+ubuntu@ip-172-31-7-134:~$
+ubuntu@ip-172-31-7-134:~$ docker network ls
+NETWORK ID     NAME           DRIVER    SCOPE
+a48dae2dab31   bridge         bridge    local
+9c834ab2ae37   host           host      local
+1671bfc9091b   my-app-net     bridge    local
+34eff3df0fc8   none           null      local
+594c7b4587bc   test_network   bridge    local
+ubuntu@ip-172-31-7-134:~$ docker run -d \
+  --name hotelhub \
+  --network test_network \
+  -p 8000:8000 \
+  hotelhub
+294f82cb2b55e68fe953e245bec31dd63f34f842a9faf3db5fb57817587aa136
+ubuntu@ip-172-31-7-134:~$ docker ps
+CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS         PORTS                                         NAMES
+294f82cb2b55   hotelhub       "sh -c 'python manag…"   4 seconds ago   Up 4 seconds   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp   hotelhub
+7eed0b48bdda   mysql:latest   "docker-entrypoint.s…"   5 hours ago     Up 5 hours     3306/tcp, 33060/tcp                           Database_container
+ubuntu@ip-172-31-7-134:~$ docker exec -it 294f82cb2b55 bash
+root@294f82cb2b55:/app# ping Database_container
+bash: ping: command not found
+root@294f82cb2b55:/app# apt update
+apt install -y iputils-ping
+Hit:1 http://deb.debian.org/debian trixie InRelease
+Get:2 http://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
+Get:3 http://deb.debian.org/debian-security trixie-security InRelease [43.4 kB]
+Get:4 http://deb.debian.org/debian trixie/main amd64 Packages [9673 kB]
+Get:5 http://deb.debian.org/debian trixie-updates/main amd64 Packages [4412 B]
+Get:6 http://deb.debian.org/debian-security trixie-security/main amd64 Packages [227 kB]
+Fetched 9995 kB in 1s (7561 kB/s)
+All packages are up to date.
+Installing:
+  iputils-ping
+
+Installing dependencies:
+  libidn2-0  libunistring5  linux-sysctl-defaults
+
+Summary:
+  Upgrading: 0, Installing: 4, Removing: 0, Not Upgrading: 0
+  Download size: 643 kB
+  Space needed: 2810 kB / 21.7 GB available
+
+Get:1 http://deb.debian.org/debian trixie/main amd64 libunistring5 amd64 1.3-2 [477 kB]
+Get:2 http://deb.debian.org/debian trixie/main amd64 libidn2-0 amd64 2.3.8-2 [109 kB]
+Get:3 http://deb.debian.org/debian trixie/main amd64 iputils-ping amd64 3:20240905-3 [51.2 kB]
+Get:4 http://deb.debian.org/debian trixie/main amd64 linux-sysctl-defaults all 4.12.1 [5724 B]
+Fetched 643 kB in 0s (8968 kB/s)
+debconf: unable to initialize frontend: Dialog
+debconf: (No usable dialog-like program is installed, so the dialog based frontend cannot be used. at /usr/share/perl5/Debconf/FrontEnd/Dialog.pm line 79, <STDIN> line 4.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 4.)
+debconf: falling back to frontend: Teletype
+Selecting previously unselected package libunistring5:amd64.
+(Reading database ... 5645 files and directories currently installed.)
+Preparing to unpack .../libunistring5_1.3-2_amd64.deb ...
+Unpacking libunistring5:amd64 (1.3-2) ...
+Selecting previously unselected package libidn2-0:amd64.
+Preparing to unpack .../libidn2-0_2.3.8-2_amd64.deb ...
+Unpacking libidn2-0:amd64 (2.3.8-2) ...
+Selecting previously unselected package iputils-ping.
+Preparing to unpack .../iputils-ping_3%3a20240905-3_amd64.deb ...
+Unpacking iputils-ping (3:20240905-3) ...
+Selecting previously unselected package linux-sysctl-defaults.
+Preparing to unpack .../linux-sysctl-defaults_4.12.1_all.deb ...
+Unpacking linux-sysctl-defaults (4.12.1) ...
+Setting up linux-sysctl-defaults (4.12.1) ...
+Setting up libunistring5:amd64 (1.3-2) ...
+Setting up libidn2-0:amd64 (2.3.8-2) ...
+Setting up iputils-ping (3:20240905-3) ...
+Processing triggers for libc-bin (2.41-12+deb13u3) ...
+root@294f82cb2b55:/app# ping Database_container
+PING Database_container (172.19.0.2) 56(84) bytes of data.
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=1 ttl=64 time=0.066 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=2 ttl=64 time=0.043 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=3 ttl=64 time=0.047 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=4 ttl=64 time=0.046 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=5 ttl=64 time=0.054 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=6 ttl=64 time=0.047 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=7 ttl=64 time=0.053 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=8 ttl=64 time=0.060 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=9 ttl=64 time=0.046 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=10 ttl=64 time=0.046 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=11 ttl=64 time=0.045 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=12 ttl=64 time=0.045 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=13 ttl=64 time=0.045 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=14 ttl=64 time=0.044 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=15 ttl=64 time=0.045 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=16 ttl=64 time=0.051 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=17 ttl=64 time=0.044 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=18 ttl=64 time=0.047 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=19 ttl=64 time=0.047 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=20 ttl=64 time=0.045 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=21 ttl=64 time=0.043 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=22 ttl=64 time=0.046 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=23 ttl=64 time=0.053 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=24 ttl=64 time=0.047 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=25 ttl=64 time=0.046 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=26 ttl=64 time=0.047 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=27 ttl=64 time=0.051 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=28 ttl=64 time=0.045 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=29 ttl=64 time=0.045 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=30 ttl=64 time=0.054 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=31 ttl=64 time=0.044 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=32 ttl=64 time=0.044 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=33 ttl=64 time=0.046 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=34 ttl=64 time=0.046 ms
+64 bytes from Database_container.test_network (172.19.0.2): icmp_seq=35 ttl=64 time=0.045 ms
+
+--- Database_container ping statistics ---
+35 packets transmitted, 35 received, 0% packet loss, time 34840ms
+rtt min/avg/max/mdev = 0.043/0.047/0.066/0.004 ms
+
+```
