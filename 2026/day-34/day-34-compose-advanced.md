@@ -372,7 +372,7 @@ local     hotelhub_redis_data
 ubuntu@ip-172-31-19-67:~$
 ```
 
-### Add labels to your services for better organization
+### Added labels to the services for better organization
 ```bash
 version: "3.9"
 
@@ -443,5 +443,62 @@ volumes:
 
 ## Task 6: Scaling (Bonus)
 
+### Try scaling your web app to 3 replicas using docker compose up --scale
 
+```bash
+ubuntu@ip-172-31-19-67:~$ docker compose down
+docker compose up -d --scale web=3
+no configuration file provided: not found
+no configuration file provided: not found
+ubuntu@ip-172-31-19-67:~$ ls
+aws  awscliv2.zip  hotelhub  terraform-pratice
+ubuntu@ip-172-31-19-67:~$ cd hotelhub
+ubuntu@ip-172-31-19-67:~/hotelhub$ docker compose down
+WARN[0000] The "q" variable is not set. Defaulting to a blank string.
+WARN[0000] The "sa0y" variable is not set. Defaulting to a blank string.
+WARN[0000] The "q" variable is not set. Defaulting to a blank string.
+WARN[0000] The "sa0y" variable is not set. Defaulting to a blank string.
+WARN[0000] The "q" variable is not set. Defaulting to a blank string.
+WARN[0000] The "sa0y" variable is not set. Defaulting to a blank string.
+WARN[0000] The "q" variable is not set. Defaulting to a blank string.
+WARN[0000] The "sa0y" variable is not set. Defaulting to a blank string.
+WARN[0000] /home/ubuntu/hotelhub/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
+[+] Running 4/4
+ ✔ Container django_web      Removed                                                                                                        10.3s
+ ✔ Container django_db       Removed                                                                                                         0.3s
+ ✔ Container redis_cache     Removed                                                                                                         0.3s
+ ✔ Network hotelhub_default  Removed                                                                                                         0.1s
+ubuntu@ip-172-31-19-67:~/hotelhub$ docker compose up -d --scale web=3
+WARN[0000] The "q" variable is not set. Defaulting to a blank string.
+WARN[0000] The "sa0y" variable is not set. Defaulting to a blank string.
+WARN[0000] The "q" variable is not set. Defaulting to a blank string.
+WARN[0000] The "sa0y" variable is not set. Defaulting to a blank string.
+WARN[0000] The "q" variable is not set. Defaulting to a blank string.
+WARN[0000] The "sa0y" variable is not set. Defaulting to a blank string.
+WARN[0000] The "q" variable is not set. Defaulting to a blank string.
+WARN[0000] The "sa0y" variable is not set. Defaulting to a blank string.
+WARN[0000] /home/ubuntu/hotelhub/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
+[+] Running 3/3
+ ✔ Network hotelhub_default  Created                                                                                                         0.1s
+ ✔ Container django_db       Created                                                                                                         0.1s
+ ✔ Container redis_cache     Created                                                                                                         0.1s
+WARNING: The "web" service is using the custom container name "django_web". Docker requires each container to have a unique name. Remove the custom name to scale the service
+ubuntu@ip-172-31-19-67:~/hotelhub$
+ubuntu@ip-172-31-19-67:~/hotelhub$
+ubuntu@ip-172-31-19-67:~/hotelhub$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+ubuntu@ip-172-31-19-67:~/hotelhub$
+ubuntu@ip-172-31-19-67:~/hotelhub$ docker ps -a
+CONTAINER ID   IMAGE                COMMAND                  CREATED          STATUS    PORTS     NAMES
+deaf861d8e0c   postgres:17-alpine   "docker-entrypoint.s…"   11 seconds ago   Created             django_db
+09da162e9cec   redis:7.4-alpine     "docker-entrypoint.s…"   11 seconds ago   Created             redis_cache
+ubuntu@ip-172-31-19-67:~/hotelhub$
+```
 
+Scaling failed because the service had a fixed container_name, which prevents Docker Compose from creating multiple replicas.
+
+### What happens? What breaks?
+I tried to scale my Django web service using Docker Compose with docker compose up -d --scale web=3. The scaling failed because I had defined a fixed container_name in my docker-compose.yml file. Docker Compose needs to create multiple containers with unique names for replicas, but the fixed name caused a naming conflict. I removed the container_name from the service, allowing Docker Compose to generate unique container names and successfully create multiple web replicas. For production scaling, I would also add a reverse proxy like Nginx or Traefik to distribute traffic between the replicas
+
+### Write in your notes: Why doesn't simple scaling work with port mapping?
+"Port mapping binds a container port to a specific host port. Multiple replicas cannot use the same host port, so scaling fails due to port conflicts. A load balancer is needed to distribute traffic across replicas."
