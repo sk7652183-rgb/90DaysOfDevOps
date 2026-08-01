@@ -524,6 +524,96 @@ ubuntu@ip-172-31-8-6:~$
 
 <img width="1335" height="498" alt="image" src="https://github.com/user-attachments/assets/e791dd30-f4dc-4c57-a9e6-4ce5695336e9" />
 
+### Pull a specific tag vs latest — what happens?
+
+A specific tag (e.g., v1) always pulls that exact version, while latest pulls whichever image is currently marked as the latest version.
+
+## Task 5: Image Best Practices
+
 ### 
-<img width="1365" height="682" alt="image" src="https://github.com/user-attachments/assets/ec699f9b-9067-4b7b-81ca-5984f0b595bb" />
+
+```bash
+
+ubuntu@ip-172-31-8-6:~$ docker run -d --name ubuntu ubuntu:latest
+Unable to find image 'ubuntu:latest' locally
+latest: Pulling from library/ubuntu
+a3679419df18: Pull complete
+ed819469700f: Pull complete
+e16351a257e4: Download complete
+Digest: sha256:3131b4cc82a783df6c9df078f86e01819a13594b865c2cad47bd1bca2b7063bb
+Status: Downloaded newer image for ubuntu:latest
+eec43e7cfa516221710c40621c2a5d8f61702c852e997799b600422e68887992
+ubuntu@ip-172-31-8-6:~$ docker run -d --name alpine-mini alpine:latest
+Unable to find image 'alpine:latest' locally
+latest: Pulling from library/alpine
+56dceff11b33: Download complete
+f5124fb579e2: Download complete
+Digest: sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
+Status: Downloaded newer image for alpine:latest
+f16b24fa6a458f1ad776c94e3fba55f154f3de156cb1f437b623bd37752e6bfe
+ubuntu@ip-172-31-8-6:~$ docker images
+                                                                                                                              i Info →   U  In Use
+IMAGE                    ID             DISK USAGE   CONTENT SIZE   EXTRA
+alpine:latest            28bd5fe8b56d         13MB         3.93MB    U
+node:22-alpine           c610fcdfb1d5        232MB         58.1MB
+sufiyn/weather-mini:v1   961dbd996cbd        237MB         58.4MB    U
+ubuntu:latest            3131b4cc82a7        161MB         45.3MB    U
+ubuntu@ip-172-31-8-6:~$
+```
+<img width="1169" height="129" alt="image" src="https://github.com/user-attachments/assets/1bbd9f0b-5f0c-42a3-9213-23c60e9b91bb" />
+
+## Don't run as root — add a non-root USER in your Dockerfile
+
+```bash
+
+FROM node:22-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+# Create a non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Change ownership of application files
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user
+USER appuser
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
+```
+### Combine RUN commands to reduce layers
+
+Before (creates multiple layers):
+
+```bash
+
+RUN addgroup -S appgroup
+RUN adduser -S appuser -G appgroup
+RUN chown -R appuser:appgroup /app
+```
+
+After (single layer):
+
+```bash
+
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup && \
+    chown -R appuser:appgroup /app
+```
+
+Docker image size reduction from combining RUN commands is usually small because Docker already shares layers efficiently, but it helps keep the image history cleaner and avoids storing unnecessary intermediate files.
+
+### Use specific tags for base images (not latest)
+
+Using specific tags like node:22-alpine instead of node:latest ensures consistent and reproducible Docker builds.
+
+
 
