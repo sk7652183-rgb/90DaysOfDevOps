@@ -447,5 +447,83 @@ Normal image: 1.61 GB
 Multi-stage image: 232 MB
 This makes the final image smaller, faster, and more efficient.
 
+## Task 3: Push to Docker Hub
 
+### Created a free Docker Hub account (if needed), logged in from the terminal, tagged the image as yourusername/image-name:tag, and pushed it to Docker Hub.
+
+```bash
+
+ubuntu@ip-172-31-8-6:~$
+ubuntu@ip-172-31-8-6:~$ docker images
+                                                                                                                              i Info →   U  In Use
+IMAGE                 ID             DISK USAGE   CONTENT SIZE   EXTRA
+node:22-alpine        c610fcdfb1d5        232MB         58.1MB
+weather-mini:latest   961dbd996cbd        237MB         58.4MB
+ubuntu@ip-172-31-8-6:~$
+ubuntu@ip-172-31-8-6:~$ docker login
+Authenticating with existing credentials... [Username: sufiyn]
+
+i Info → To login with a different account, run 'docker logout' followed by 'docker login'
+
+
+Login Succeeded
+ubuntu@ip-172-31-8-6:~$ docker tag weather-mini:latest sufiyn/weather-mini:v1
+ubuntu@ip-172-31-8-6:~$ docker images
+                                                                                                                              i Info →   U  In Use
+IMAGE                    ID             DISK USAGE   CONTENT SIZE   EXTRA
+node:22-alpine           c610fcdfb1d5        232MB         58.1MB
+sufiyn/weather-mini:v1   961dbd996cbd        237MB         58.4MB
+weather-mini:latest      961dbd996cbd        237MB         58.4MB
+ubuntu@ip-172-31-8-6:~$ docker push sufiyn/weather-mini:v1
+The push refers to repository [docker.io/sufiyn/weather-mini]
+efbef6f9e333: Mounted from library/node
+4a6dec83989a: Pushed
+e2a81fb3d6ae: Pushed
+a402176eca24: Pushed
+c3bc37e37e76: Pushed
+55afa1ecc21d: Mounted from library/nginx
+a2980c1fee17: Mounted from library/node
+16da5a640377: Mounted from library/node
+6fa1c242ab75: Pushed
+v1: digest: sha256:961dbd996cbd211e61db1953f12b71f84ea8bab8f86ee8dc3a5fbcc8b81c5b20 size: 2280
+ubuntu@ip-172-31-8-6:~$
+
+```
+### Pull it on a different machine (or after removing locally) to verify
+
+```bash
+
+ubuntu@ip-172-31-8-6:~$ docker images
+                                                                                                                              i Info →   U  In Use
+IMAGE            ID             DISK USAGE   CONTENT SIZE   EXTRA
+node:22-alpine   c610fcdfb1d5        232MB         58.1MB
+ubuntu@ip-172-31-8-6:~$ docker pull sufiyn/weather-mini:v1
+v1: Pulling from sufiyn/weather-mini
+Digest: sha256:961dbd996cbd211e61db1953f12b71f84ea8bab8f86ee8dc3a5fbcc8b81c5b20
+Status: Downloaded newer image for sufiyn/weather-mini:v1
+docker.io/sufiyn/weather-mini:v1
+ubuntu@ip-172-31-8-6:~$ docker images
+                                                                                                                              i Info →   U  In Use
+IMAGE                    ID             DISK USAGE   CONTENT SIZE   EXTRA
+node:22-alpine           c610fcdfb1d5        232MB         58.1MB
+sufiyn/weather-mini:v1   961dbd996cbd        237MB         58.4MB
+ubuntu@ip-172-31-8-6:~$
+```
+
+## Task 4: Docker Hub Repository
+
+### Go to Docker Hub and check your pushed image
+
+### <img width="1365" height="678" alt="image" src="https://github.com/user-attachments/assets/e833d595-0aa3-4bfb-b701-fd464c091159" />
+
+### Add a description to the repository
+
+<img width="1334" height="544" alt="image" src="https://github.com/user-attachments/assets/46b97ea1-b040-4adc-b0b2-c7eabf973333" />
+
+### Explore the tags tab — understand how versioning works
+
+<img width="1335" height="498" alt="image" src="https://github.com/user-attachments/assets/e791dd30-f4dc-4c57-a9e6-4ce5695336e9" />
+
+### 
+<img width="1365" height="682" alt="image" src="https://github.com/user-attachments/assets/ec699f9b-9067-4b7b-81ca-5984f0b595bb" />
 
