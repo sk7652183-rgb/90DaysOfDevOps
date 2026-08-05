@@ -649,11 +649,11 @@ You can find all the Docker images for this project here:
 
 ## 📄 DevOps Documentation
 
-The complete Docker, Docker Compose, and DevOps implementation is available in the **devops** branch.
+The complete Docker, Docker Compose, and DevOps implementation is available in the **DevOps** branch.
 
 👉 **View the DevOps README**
 
-[![DevOps Documentation](https://img.shields.io/badge/📖-Open%20DevOps%20README-blue?style=for-the-badge)](https://github.com/sk7652183-rgb/school-attendance-app/blob/devops/README.md)
+[![DevOps Documentation](https://img.shields.io/badge/📖-Open%20DevOps%20README-blue?style=for-the-badge)](https://github.com/sk7652183-rgb/school-attendance-app/blob/DevOps/README.md)
 
 Or browse the **devops** branch directly:
 
