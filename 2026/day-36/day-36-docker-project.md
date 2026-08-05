@@ -647,6 +647,16 @@ You can find all the Docker images for this project here:
 
 [Docker Hub Repositories](https://hub.docker.com/repositories/sufiyn)
 
+## 📄 DevOps Documentation
 
-<img width="1365" height="731" alt="image" src="https://github.com/user-attachments/assets/d8e75d37-f948-4fcc-81d9-980ddb0beeb7" />
+The complete Docker, Docker Compose, and DevOps implementation is available in the **devops** branch.
+
+👉 **View the DevOps README**
+
+[![DevOps Documentation](https://img.shields.io/badge/📖-Open%20DevOps%20README-blue?style=for-the-badge)](https://github.com/sk7652183-rgb/school-attendance-app/blob/devops/README.md)
+
+Or browse the **devops** branch directly:
+
+🔗 https://github.com/sk7652183-rgb/school-attendance-app/tree/devops
+
 
