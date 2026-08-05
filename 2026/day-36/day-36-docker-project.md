@@ -586,3 +586,67 @@ Click the image below to watch the demo.
 
 ---
 
+## Task 4: Ship It
+
+### Tagged the application image, pushed it to Docker Hub, shared the Docker Hub repository link, and created a README.md containing the application overview, Docker Compose setup instructions, and the required environment variables.
+
+```bash
+
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker images
+                                                                                                                              i Info →   U  In Use
+IMAGE                                   ID             DISK USAGE   CONTENT SIZE   EXTRA
+mongo:7                                 35a5926f71f8       1.19GB          297MB    U
+school-attendance-app-backend:latest    d9879542a347        280MB         64.4MB    U
+school-attendance-app-frontend:latest   147fa4481860       74.2MB         20.5MB    U
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker tag school-attendance-app-backend:latest sufiyn/school-attendance-app-backend:latest
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker tag school-attendance-app-frontend:latest sufiyn/school-attendance-app-frontend:latest
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker images
+                                                                                                                              i Info →   U  In Use
+IMAGE                                          ID             DISK USAGE   CONTENT SIZE   EXTRA
+mongo:7                                        35a5926f71f8       1.19GB          297MB    U
+school-attendance-app-backend:latest           d9879542a347        280MB         64.4MB    U
+school-attendance-app-frontend:latest          147fa4481860       74.2MB         20.5MB    U
+sufiyn/school-attendance-app-backend:latest    d9879542a347        280MB         64.4MB    U
+sufiyn/school-attendance-app-frontend:latest   147fa4481860       74.2MB         20.5MB    U
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker push sufiyn/school-attendance-app-backend:latest
+The push refers to repository [docker.io/sufiyn/school-attendance-app-backend]
+842c3fc9f2c5: Pushed
+efbef6f9e333: Mounted from library/node
+beb9729922f5: Pushed
+be16ae6b4cd2: Pushed
+6951cbbb7e11: Pushed
+16da5a640377: Mounted from library/node
+c64ba2efec29: Pushed
+161e4946a9d0: Pushed
+ee17a423126a: Pushed
+6562fb7cefa4: Pushed
+763c9d5d2a6a: Pushed
+55afa1ecc21d: Mounted from library/node
+be0192bfee09: Pushed
+a2980c1fee17: Mounted from library/node
+b6fce451218a: Pushed
+latest: digest: sha256:d9879542a347828e087092abea9e36ba117afe563125c58688b7cca0026a7372 size: 856
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker push sufiyn/school-attendance-app-frontend:latest
+The push refers to repository [docker.io/sufiyn/school-attendance-app-frontend]
+897c40d76d77: Pushed
+fc21a1d387f5: Mounted from library/nginx
+5406ed7b06d9: Mounted from library/nginx
+b57cadcf5a05: Pushed
+4abcf2066143: Mounted from library/nginx
+e6ef242c1570: Mounted from library/nginx
+13fcfbc94648: Mounted from library/nginx
+d4bca490e609: Mounted from library/nginx
+8a3742a9529d: Mounted from library/nginx
+0d0c16747d2c: Mounted from library/nginx
+latest: digest: sha256:147fa44818601f0d9b402b3f3eb79aa442224bc0a1618337db51375429f25aea size: 856
+ubuntu@ip-172-31-7-36:~/school-attendance-app$
+```
+## Docker Hub Repository
+
+You can find all the Docker images for this project here:
+
+[Docker Hub Repositories](https://hub.docker.com/repositories/sufiyn)
+
+
+<img width="1365" height="731" alt="image" src="https://github.com/user-attachments/assets/d8e75d37-f948-4fcc-81d9-980ddb0beeb7" />
+
