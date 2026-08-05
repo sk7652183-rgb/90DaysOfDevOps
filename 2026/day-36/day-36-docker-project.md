@@ -655,8 +655,110 @@ The complete Docker, Docker Compose, and DevOps implementation is available in t
 
 [![DevOps Documentation](https://img.shields.io/badge/📖-Open%20DevOps%20README-blue?style=for-the-badge)](https://github.com/sk7652183-rgb/school-attendance-app/blob/DevOps/README.md)
 
+
 Or browse the **devops** branch directly:
 
 🔗 https://github.com/sk7652183-rgb/school-attendance-app/tree/DevOps
 
+## Test the Whole Flow
 
+### Remove all local images and containers
+
+```bash
+
+ubuntu@ip-172-31-7-36:~$
+ubuntu@ip-172-31-7-36:~$
+ubuntu@ip-172-31-7-36:~$ docker ps
+CONTAINER ID   IMAGE                            COMMAND                  CREATED       STATUS       PORTS                                                   NAMES
+eb13d50e4235   school-attendance-app-frontend   "/docker-entrypoint.…"   3 hours ago   Up 3 hours   0.0.0.0:80->80/tcp, [::]:80->80/tcp                     school-attendance-frontend
+0077813c0368   school-attendance-app-backend    "docker-entrypoint.s…"   3 hours ago   Up 3 hours   3000/tcp, 0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp   school-attendance-backend
+c2302d551ad1   mongo:7                          "docker-entrypoint.s…"   3 hours ago   Up 3 hours   0.0.0.0:27017->27017/tcp, [::]:27017->27017/tcp         attendance-mangodb
+ubuntu@ip-172-31-7-36:~$
+ubuntu@ip-172-31-7-36:~$
+ubuntu@ip-172-31-7-36:~$ ls
+school-attendance-app
+ubuntu@ip-172-31-7-36:~$ cd school-attendance-app
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ ls
+Dockerfile  controllers         frontend    node_modules       routes        {config,models,middleware,controllers,routes,utils}
+README.md   createUser.js       middleware  package-lock.json  seedAdmin.js
+config      docker-compose.yml  models      package.json       server.js
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker compose down
+WARN[0000] /home/ubuntu/school-attendance-app/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
+[+] Running 4/4
+ ✔ Container school-attendance-frontend   Removed                                                                                            0.5s
+ ✔ Container school-attendance-backend    Removed                                                                                           10.2s
+ ✔ Container attendance-mangodb           Removed                                                                                            0.3s
+ ✔ Network school-attendance-app_default  Removed                                                                                            0.1s
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker images
+                                                                                                                              i Info →   U  In Use
+IMAGE                                          ID             DISK USAGE   CONTENT SIZE   EXTRA
+mongo:7                                        35a5926f71f8       1.19GB          297MB
+school-attendance-app-backend:latest           d9879542a347        280MB         64.4MB
+school-attendance-app-frontend:latest          147fa4481860       74.2MB         20.5MB
+sufiyn/school-attendance-app-backend:latest    d9879542a347        280MB         64.4MB
+sufiyn/school-attendance-app-frontend:latest   147fa4481860       74.2MB         20.5MB
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker rmi mongo:7 \
+school-attendance-app-backend:latest \
+school-attendance-app-frontend:latest \
+sufiyn/school-attendance-app-backend:latest \
+sufiyn/school-attendance-app-frontend:latest
+Untagged: mongo:7
+Deleted: sha256:35a5926f71f8b6cb19206bee928c5a85f241a8be99f20c81abe35ae78a73415d
+Untagged: school-attendance-app-backend:latest
+Untagged: school-attendance-app-frontend:latest
+Untagged: sufiyn/school-attendance-app-backend:latest
+Deleted: sha256:d9879542a347828e087092abea9e36ba117afe563125c58688b7cca0026a7372
+Untagged: sufiyn/school-attendance-app-frontend:latest
+Deleted: sha256:147fa44818601f0d9b402b3f3eb79aa442224bc0a1618337db51375429f25aea
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker images
+                                                                                                                              i Info →   U  In Use
+IMAGE   ID             DISK USAGE   CONTENT SIZE   EXTRA
+```
+
+### Pull from Docker Hub and run using only your compose file
+```bash
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker compose up -d
+WARN[0000] /home/ubuntu/school-attendance-app/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
+[+] Running 26/26
+ ✔ frontend Pulled                                                                                                                           1.8s
+   ✔ 897c40d76d77 Pull complete                                                                                                              0.1s
+   ✔ b57cadcf5a05 Download complete                                                                                                          0.1s
+ ✔ backend Pulled                                                                                                                            3.7s
+   ✔ 763c9d5d2a6a Pull complete                                                                                                              2.5s
+   ✔ b6fce451218a Pull complete                                                                                                              0.1s
+   ✔ c64ba2efec29 Pull complete                                                                                                              0.9s
+   ✔ 161e4946a9d0 Pull complete                                                                                                              0.1s
+   ✔ 842c3fc9f2c5 Pull complete                                                                                                              1.2s
+   ✔ ee17a423126a Pull complete                                                                                                              0.1s
+   ✔ beb9729922f5 Pull complete                                                                                                              0.1s
+   ✔ be16ae6b4cd2 Pull complete                                                                                                              1.3s
+   ✔ be0192bfee09 Pull complete                                                                                                              1.4s
+   ✔ 6951cbbb7e11 Pull complete                                                                                                              0.1s
+   ✔ 6562fb7cefa4 Download complete                                                                                                          0.0s
+ ✔ mongo Pulled                                                                                                                             15.6s
+   ✔ 15a369849dbf Pull complete                                                                                                             14.4s
+   ✔ 39a945af8df2 Pull complete                                                                                                              5.9s
+   ✔ 9edaf47f313b Pull complete                                                                                                              6.0s
+   ✔ bb94a6d99c0a Pull complete                                                                                                              6.1s
+   ✔ 8932aff54341 Pull complete                                                                                                              6.3s
+   ✔ 4b0954780896 Pull complete                                                                                                              0.3s
+   ✔ dff0d25b5d25 Pull complete                                                                                                              0.3s
+   ✔ 9fc668cfba29 Pull complete                                                                                                             14.3s
+   ✔ b3c1ad30c086 Download complete                                                                                                          0.1s
+   ✔ 0da68b64f60d Download complete                                                                                                          0.0s
+[+] Running 4/4
+ ✔ Network school-attendance-app_default  Created                                                                                            0.1s
+ ✔ Container attendance-mongodb           Started                                                                                            0.7s
+ ✔ Container school-attendance-backend    Started                                                                                            0.8s
+ ✔ Container school-attendance-frontend   Started                                                                                            1.0s
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker ps
+CONTAINER ID   IMAGE                                   COMMAND                  CREATED         STATUS         PORTS                                                   NAMES
+5251986db833   sufiyn/school-attendance-app-frontend   "/docker-entrypoint.…"   5 seconds ago   Up 5 seconds   0.0.0.0:80->80/tcp, [::]:80->80/tcp                     school-attendance-frontend
+ca862a1176b5   sufiyn/school-attendance-app-backend    "docker-entrypoint.s…"   5 seconds ago   Up 5 seconds   3000/tcp, 0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp   school-attendance-backend
+9e2e3583c111   mongo:7                                 "docker-entrypoint.s…"   6 seconds ago   Up 5 seconds   0.0.0.0:27017->27017/tcp, [::]:27017->27017/tcp         attendance-mongodb
+ubuntu@ip-172-31-7-36:~/school-attendance-app$
+```
+
+### Does it work fresh? If not — fix it until it does
+
+Yes, it is working fine. The images were successfully pulled from Docker Hub after updating the Docker Compose file to use the images from the registry.
