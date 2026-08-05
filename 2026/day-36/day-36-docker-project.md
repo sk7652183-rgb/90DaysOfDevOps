@@ -657,6 +657,6 @@ The complete Docker, Docker Compose, and DevOps implementation is available in t
 
 Or browse the **devops** branch directly:
 
-🔗 https://github.com/sk7652183-rgb/school-attendance-app/tree/devops
+🔗 https://github.com/sk7652183-rgb/school-attendance-app/tree/DevOps
 
 
