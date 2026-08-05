@@ -447,3 +447,142 @@ school-attendance-app:latest      8b59882a086b        280MB         64.4MB
 school-attendance-app:v1          44d2dd9bf086        300MB         69.4MB
 ubuntu@ip-172-31-7-36:~/school-attendance-app/frontend$
 ```
+
+
+## Task 3: Add Docker Compose
+
+### Configured Docker Compose with an app service (built from a Dockerfile), a database service, persistent database volumes, a custom network, environment variables from a .env file, and database health checks
+
+```bash
+
+   │ File: docker-compose.yml
+───────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ version: "3.8"
+   2   │ services:
+   3   │   frontend:
+   4   │     build: ./frontend
+   5   │     container_name: school-attendance-frontend
+   6   │     ports:
+   7   │       - "80:80"
+   8   │     depends_on:
+   9   │       - backend
+  10   │     restart: unless-stopped
+  11   │
+  12   │   backend:
+  13   │     build:
+  14   │       context: .
+  15   │     container_name: school-attendance-backend
+  16   │     ports:
+  17   │       - "5000:5000"
+  18   │     env_file:
+  19   │       - .env
+  20   │     command: sh -c "node seedAdmin.js && node server.js"
+  21   │     depends_on:
+  22   │       - mongo
+  23   │     restart: unless-stopped
+  24   │
+  25   │   mongo:
+  26   │     image: mongo:7
+  27   │     container_name: attendance-mangodb
+  28   │     ports:
+  29   │       - "27017:27017"
+  30   │     volumes:
+  31   │       - mongo-data:/data/db
+  32   │     restart: unless-stopped
+  33   │
+  34   │ volumes:
+  35   │   mongo-data:
+
+```
+
+```bash
+ubuntu@ip-172-31-7-36:~/school-attendance-app/frontend/js$ docker compose up -d
+WARN[0000] /home/ubuntu/school-attendance-app/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
+[+] Running 11/11
+ ✔ mongo Pulled                                                                                                                             14.4s
+   ✔ 15a369849dbf Pull complete                                                                                                              0.3s
+   ✔ 39a945af8df2 Pull complete                                                                                                              5.1s
+   ✔ 9edaf47f313b Pull complete                                                                                                              0.3s
+   ✔ bb94a6d99c0a Pull complete                                                                                                              5.3s
+   ✔ 8932aff54341 Pull complete                                                                                                              5.3s
+   ✔ 4b0954780896 Pull complete                                                                                                              0.4s
+   ✔ dff0d25b5d25 Pull complete                                                                                                              0.4s
+   ✔ 9fc668cfba29 Pull complete                                                                                                             13.3s
+   ✔ 0da68b64f60d Download complete                                                                                                          0.0s
+   ✔ b3c1ad30c086 Download complete                                                                                                          0.1s
+WARN[0014] Docker Compose is configured to build using Bake, but buildx isn't installed
+[+] Building 12.8s (27/27) FINISHED                                                                                                docker:default
+ => [backend internal] load build definition from Dockerfile                                                                                 0.0s
+ => => transferring dockerfile: 686B                                                                                                         0.0s
+ => [backend internal] load metadata for docker.io/library/node:22-alpine                                                                    0.6s
+ => [backend internal] load .dockerignore                                                                                                    0.0s
+ => => transferring context: 116B                                                                                                            0.0s
+ => [backend internal] load build context                                                                                                    0.0s
+ => => transferring context: 14.81kB                                                                                                         0.0s
+ => [backend deps 1/4] FROM docker.io/library/node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32         0.0s
+ => => resolve docker.io/library/node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32                      0.0s
+ => CACHED [backend deps 2/4] WORKDIR /app                                                                                                   0.0s
+ => CACHED [backend deps 3/4] COPY package*.json ./                                                                                          0.0s
+ => CACHED [backend deps 4/4] RUN npm ci --omit=dev && npm cache clean --force                                                               0.0s
+ => CACHED [backend runner  3/11] COPY --from=deps /app/node_modules ./node_modules                                                          0.0s
+ => CACHED [backend runner  4/11] COPY server.js seedAdmin.js createUser.js ./                                                               0.0s
+ => CACHED [backend runner  5/11] COPY config ./config                                                                                       0.0s
+ => CACHED [backend runner  6/11] COPY controllers ./controllers                                                                             0.0s
+ => CACHED [backend runner  7/11] COPY middleware ./middleware                                                                               0.0s
+ => CACHED [backend runner  8/11] COPY models ./models                                                                                       0.0s
+ => CACHED [backend runner  9/11] COPY routes ./routes                                                                                       0.0s
+ => [backend runner 10/11] COPY frontend ./frontend                                                                                          0.1s
+ => [backend runner 11/11] RUN addgroup -S appgroup && adduser -S appuser -G appgroup     && chown -R appuser:appgroup /app                  8.6s
+ => [backend] exporting to image                                                                                                             2.0s
+ => => exporting layers                                                                                                                      1.0s
+ => => exporting manifest sha256:22b548af71a24dd188976ffb6f58ee53ce25a1a68310dd51faed64c4c160f441                                            0.0s
+ => => exporting config sha256:fbb31b25f2559f40561bfbe4c7e6842e5a5eaf2087c4dd8c73689a4daaebd1bd                                              0.0s
+ => => exporting attestation manifest sha256:3683220173bde2e13bf15b159c5de91bae31d4055c8edde5eac77432e9d6b946                                0.0s
+ => => exporting manifest list sha256:d9879542a347828e087092abea9e36ba117afe563125c58688b7cca0026a7372                                       0.0s
+ => => naming to docker.io/library/school-attendance-app-backend:latest                                                                      0.0s
+ => => unpacking to docker.io/library/school-attendance-app-backend:latest                                                                   0.8s
+ => [backend] resolving provenance for metadata file                                                                                         0.0s
+ => [frontend internal] load build definition from Dockerfile                                                                                0.0s
+ => => transferring dockerfile: 138B                                                                                                         0.0s
+ => [frontend internal] load metadata for docker.io/library/nginx:1.25-alpine                                                                0.3s
+ => [frontend internal] load .dockerignore                                                                                                   0.0s
+ => => transferring context: 2B                                                                                                              0.0s
+ => [frontend internal] load build context                                                                                                   0.0s
+ => => transferring context: 13.70kB                                                                                                         0.0s
+ => CACHED [frontend 1/2] FROM docker.io/library/nginx:1.25-alpine@sha256:516475cc129da42866742567714ddc681e5eed7b9ee0b9e9c015e464b4221a00   0.0s
+ => => resolve docker.io/library/nginx:1.25-alpine@sha256:516475cc129da42866742567714ddc681e5eed7b9ee0b9e9c015e464b4221a00                   0.0s
+ => [frontend 2/2] COPY . /usr/share/nginx/html                                                                                              0.1s
+ => [frontend] exporting to image                                                                                                            0.3s
+ => => exporting layers                                                                                                                      0.1s
+ => => exporting manifest sha256:caec2a03e0c08a68893d793658f6c84b4f33aed9453d28f9592d099da9744dab                                            0.0s
+ => => exporting config sha256:91862896c486343d78895d7304bf674ad34d30c7c4f2630ff57790196fa27100                                              0.0s
+ => => exporting attestation manifest sha256:53436b7e6d8b5f38942431225f64e9a18305d74952404277b4486e4c4dc952a7                                0.0s
+ => => exporting manifest list sha256:147fa44818601f0d9b402b3f3eb79aa442224bc0a1618337db51375429f25aea                                       0.0s
+ => => naming to docker.io/library/school-attendance-app-frontend:latest                                                                     0.0s
+ => => unpacking to docker.io/library/school-attendance-app-frontend:latest                                                                  0.0s
+ => [frontend] resolving provenance for metadata file                                                                                        0.0s
+[+] Running 6/6
+ ✔ backend                                Built                                                                                              0.0s
+ ✔ frontend                               Built                                                                                              0.0s
+ ✔ Network school-attendance-app_default  Created                                                                                            0.1s
+ ✔ Container attendance-mangodb           Started                                                                                            0.5s
+ ✔ Container school-attendance-backend    Started                                                                                            0.7s
+ ✔ Container school-attendance-frontend   Started                                                                                            1.0s
+
+ubuntu@ip-172-31-7-36:~/school-attendance-app$ docker ps
+CONTAINER ID   IMAGE                            COMMAND                  CREATED          STATUS          PORTS                                                   NAMES
+eb13d50e4235   school-attendance-app-frontend   "/docker-entrypoint.…"   56 minutes ago   Up 56 minutes   0.0.0.0:80->80/tcp, [::]:80->80/tcp                     school-attendance-frontend
+0077813c0368   school-attendance-app-backend    "docker-entrypoint.s…"   56 minutes ago   Up 56 minutes   3000/tcp, 0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp   school-attendance-backend
+c2302d551ad1   mongo:7                          "docker-entrypoint.s…"   56 minutes ago   Up 56 minutes   0.0.0.0:27017->27017/tcp, [::]:27017->27017/tcp         attendance-mangodb
+ubuntu@ip-172-31-7-36:~/school-attendance-app$
+
+```
+
+# 🎥 Demo Video
+
+Click the image below to watch the demo.
+
+[![Watch Demo](https://img.shields.io/badge/▶-Watch%20Demo-red?style=for-the-badge)](https://github.com/user-attachments/assets/3e452e8a-b382-418f-a02b-8e36024da481)
+
+---
+
