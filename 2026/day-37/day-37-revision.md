@@ -54,3 +54,6 @@ COPY is used to copy files and directories from the build context into the Docke
 ### How do you check how much disk space Docker is using?
 
 We can use docker system df to check how much disk space Docker is using. It shows the disk usage of images, containers, volumes, and build cache.
+
+
+
