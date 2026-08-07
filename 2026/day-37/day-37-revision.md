@@ -1,10 +1,10 @@
-# Day 37 – Docker Revision & Cheat Sheet
+#  Day 37 – Docker Revision & Cheat Sheet
 
-## Self-Assessment Checklist
-
-## ✅ Docker Skills Checklist
+##  Self-Assessment Checklist
 
 Mark yourself honestly — **can do**, **shaky**, or **haven't done**.
+
+## ✅ Docker Skills Checklist
 
 - [x] Run a container from Docker Hub (interactive + detached)
 - [x] List, stop, remove containers and images
@@ -21,44 +21,320 @@ Mark yourself honestly — **can do**, **shaky**, or **haven't done**.
 - [x] Push an image to Docker Hub
 - [x] Use `healthcheck` and `depends_on`
 
-## Quick-Fire Questions
+---
 
-### What is the difference between an image and a container?
+# ⚡ Quick-Fire Docker Questions
 
-A Docker image is a blueprint or template that contains the application, its dependencies, libraries, and configuration. A Docker container is a running instance of that image. we can create multiple containers from the same image, and each container runs independently.
+## 1. What is the difference between an image and a container?
 
-### What happens to data inside a container when you remove it?
+A Docker **image** is a blueprint or template that contains the application, dependencies, libraries, and configuration required to run an application.
 
-Containers are ephemeral, which means their data is temporary. When a container is removed, all data stored inside the container is lost unless it is stored in a Docker volume or a bind mount.
+A Docker **container** is a running instance of that image.
 
-### How do two containers on the same custom network communicate?
+We can create multiple containers from the same image, and each container runs independently.
 
-Two containers connected to the same custom Docker network can communicate with each other using container names as DNS names. Docker provides built-in DNS resolution within custom networks, so containers can reach each other without using IP addresses.
+Example:
 
-### What does docker compose down -v do differently from docker compose down?
+```
+Docker Image  →  Docker Container
 
-docker compose down stops and removes containers and networks created by Docker Compose, but it keeps the volumes. docker compose down -v does the same thing but also removes the named volumes, which means persistent data stored in those volumes will be deleted.
+nginx image   →  Running nginx container
+```
 
-### Why are multi-stage builds useful?
+---
 
-Multi-stage builds help reduce Docker image size and improve security by separating the build environment from the final runtime image. We can install all required build dependencies in the first stage, then copy only the required application files and dependencies into the final image. This results in a smaller image with fewer unnecessary packages and a reduced attack surface.
+## 2. What happens to data inside a container when you remove it?
 
-### What is the difference between COPY and ADD?
+Containers are **ephemeral**, which means their data is temporary.
 
-COPY is used to copy files and directories from the build context into the Docker image. ADD has the same functionality as COPY but provides additional features like extracting compressed archives and downloading files from URLs. Docker recommends using COPY unless you specifically need the extra features of ADD.
+When a container is removed:
 
-### What does -p 8080:80 mean?
+- Data stored inside the container writable layer is deleted.
+- Data remains only if it is stored using:
+  - Docker volumes
+  - Bind mounts
 
--p 8080:80 maps port 8080 on the host machine to port 80 inside the container. It allows users to access the application running on container port 80 through the host machine's port 8080.
+Example:
 
-### How do you check how much disk space Docker is using?
+```
+Container removed ❌
+Data inside container ❌
 
-We can use docker system df to check how much disk space Docker is using. It shows the disk usage of images, containers, volumes, and build cache.
+Volume data ✅
+Bind mount data ✅
+```
 
+---
 
-## Create docker-cheatsheet.md organized by category:
+## 3. How do two containers on the same custom network communicate?
 
-## 🐳 Docker Documentation
+Two containers connected to the same custom Docker network communicate using **container names as DNS names**.
+
+Docker provides built-in DNS resolution inside custom networks, allowing containers to communicate without using IP addresses.
+
+Example:
+
+```
+Backend Container
+        |
+        |
+        ↓
+mongodb://database:27017
+        |
+        |
+Database Container
+```
+
+Here:
+
+```
+database = container name
+```
+
+---
+
+## 4. What does `docker compose down -v` do differently from `docker compose down`?
+
+### `docker compose down`
+
+Removes:
+
+- Containers
+- Networks
+
+Keeps:
+
+- Volumes
+
+---
+
+### `docker compose down -v`
+
+Removes:
+
+- Containers
+- Networks
+- Volumes
+
+The `-v` flag deletes named volumes, which means persistent data stored inside those volumes will also be removed.
+
+---
+
+## 5. Why are multi-stage builds useful?
+
+Multi-stage builds help:
+
+- Reduce Docker image size
+- Improve security
+- Remove unnecessary build dependencies
+
+The build process is separated into multiple stages:
+
+1. Build stage:
+   - Installs dependencies
+   - Compiles application
+   - Creates build artifacts
+
+2. Runtime stage:
+   - Copies only required files
+   - Runs the application
+
+Benefits:
+
+- Smaller images
+- Fewer packages
+- Reduced attack surface
+
+---
+
+## 6. What is the difference between `COPY` and `ADD`?
+
+### COPY
+
+Used to copy files and directories from the build context into the Docker image.
+
+Example:
+
+```dockerfile
+COPY package.json /app/
+```
+
+### ADD
+
+Has the same functionality as COPY but provides additional features:
+
+- Extract compressed archives
+- Download files from URLs
+
+Example:
+
+```dockerfile
+ADD app.tar.gz /app/
+```
+
+Docker recommends using **COPY** unless you specifically need ADD features.
+
+---
+
+## 7. What does `-p 8080:80` mean?
+
+Port mapping syntax:
+
+```bash
+-p host_port:container_port
+```
+
+Example:
+
+```bash
+docker run -p 8080:80 nginx
+```
+
+Meaning:
+
+```
+Host Machine Port 8080
+          |
+          ↓
+Container Port 80
+```
+
+It allows users to access the application running inside the container through the host machine.
+
+---
+
+## 8. How do you check how much disk space Docker is using?
+
+Use:
+
+```bash
+docker system df
+```
+
+It shows disk usage for:
+
+- Images
+- Containers
+- Volumes
+- Build cache
+
+For detailed information:
+
+```bash
+docker system df -v
+```
+
+---
+
+# 📚 Docker Documentation
+
+Docker commands and Dockerfile instructions:
 
 ➡️ [View Docker Cheat Sheet & Dockerfile Instructions](./docker-cheatsheet.md)
 
+---
+
+# 🔁 Revisit Weak Spots
+
+## 1. Explain CMD vs ENTRYPOINT
+
+Both `CMD` and `ENTRYPOINT` define what command runs when a container starts.
+
+### Simple Difference:
+
+| Instruction | Purpose |
+|---|---|
+| `CMD` | Default command (can be overridden) |
+| `ENTRYPOINT` | Main command (usually fixed) |
+
+Example:
+
+```dockerfile
+FROM ubuntu
+
+ENTRYPOINT ["echo"]
+
+CMD ["Hello Docker"]
+```
+
+Run:
+
+```bash
+docker run image_name
+```
+
+Output:
+
+```
+Hello Docker
+```
+
+Run:
+
+```bash
+docker run image_name DevOps
+```
+
+Output:
+
+```
+DevOps
+```
+
+Here:
+
+```
+ENTRYPOINT → echo
+CMD        → Default argument
+```
+
+---
+
+## 2. Use Bind Mounts
+
+A **bind mount** maps a file or directory from the host machine directly into a container.
+
+It is commonly used for:
+
+- Development environments
+- Sharing source code
+- Testing changes without rebuilding images
+
+### Syntax:
+
+```bash
+docker run -v <host-path>:<container-path> <image>
+```
+
+Example:
+
+```bash
+docker run -v /home/user/project:/app node-app
+```
+
+Mapping:
+
+```
+Host Machine              Container
+
+/home/user/project  --->  /app
+```
+
+Changes made on the host are immediately available inside the container.
+
+---
+
+# 🎯 Day 37 Summary
+
+Topics revised:
+
+✅ Docker images and containers  
+✅ Container lifecycle  
+✅ Docker networking  
+✅ Docker volumes  
+✅ Docker Compose  
+✅ Multi-stage builds  
+✅ Dockerfile instructions  
+✅ CMD vs ENTRYPOINT  
+✅ Bind mounts  
+✅ Docker troubleshooting commands  
