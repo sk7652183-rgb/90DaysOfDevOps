@@ -322,6 +322,65 @@ Deploy Stage
 
 **Workflow Name:** `(Compiler) Discord Notify`
 
+## Workflow YAML
+
+```yaml
+name: (Compiler) Discord Notify
+
+on:
+  pull_request_target:
+    types: [opened, ready_for_review]
+    paths:
+      - compiler/**
+      - .github/workflows/compiler_**.yml
+
+permissions: {}
+
+jobs:
+  check_access:
+    if: ${{ github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
+    outputs:
+      is_member_or_collaborator: ${{ steps.check_is_member_or_collaborator.outputs.is_member_or_collaborator }}
+
+    steps:
+      - run: echo ${{ github.event.pull_request.author_association }}
+
+      - name: Check is member or collaborator
+        id: check_is_member_or_collaborator
+        if: ${{ github.event.pull_request.author_association == 'MEMBER' || github.event.pull_request.author_association == 'COLLABORATOR' }}
+        run: echo "is_member_or_collaborator=true" >> "$GITHUB_OUTPUT"
+
+  check_maintainer:
+    if: ${{ needs.check_access.outputs.is_member_or_collaborator == 'true' || needs.check_access.outputs.is_member_or_collaborator == true }}
+    needs: [check_access]
+    uses: react/react/.github/workflows/shared_check_maintainer.yml@main
+    permissions:
+      # Used by check_maintainer
+      contents: read
+    with:
+      actor: ${{ github.event.pull_request.user.login }}
+
+  notify:
+    if: ${{ needs.check_maintainer.outputs.is_core_team == 'true' }}
+    needs: check_maintainer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Discord Webhook Action
+        uses: tsickert/discord-webhook@86dc739f3f165f16dadc5666051c367efa1692f4
+        with:
+          webhook-url: ${{ secrets.COMPILER_DISCORD_WEBHOOK_URL }}
+          embed-author-name: ${{ github.event.pull_request.user.login }}
+          embed-author-url: ${{ github.event.pull_request.user.html_url }}
+          embed-author-icon-url: ${{ github.event.pull_request.user.avatar_url }}
+          embed-title: '#${{ github.event.number }} (+${{ github.event.pull_request.additions }} -${{ github.event.pull_request.deletions }}): ${{ github.event.pull_request.title }}'
+          embed-description: ${{ github.event.pull_request.body }}
+          embed-url: ${{ github.event.pull_request.html_url }}
+```
+
+---
+
 ## 1. What triggers it?
 
 The workflow is triggered by a **Pull Request** using `pull_request_target`.
@@ -336,6 +395,14 @@ It only runs when the Pull Request contains changes in:
 * `compiler/**`
 * `.github/workflows/compiler_**.yml`
 
+The workflow also checks:
+
+```yaml
+if: ${{ github.event.pull_request.draft == false }}
+```
+
+So the jobs do not proceed for a **draft Pull Request**.
+
 ---
 
 ## 2. How many jobs does it have?
@@ -346,91 +413,140 @@ The workflow contains **3 jobs**:
 2. `check_maintainer`
 3. `notify`
 
+---
+
+## 3. What does each job do?
+
 ### Job 1: `check_access`
 
-This job checks whether the Pull Request author is a:
+The `check_access` job checks whether the Pull Request author is a:
 
 * `MEMBER`
 * `COLLABORATOR`
 
-If the author is a member or collaborator, it sets the output:
+It checks:
+
+```yaml
+github.event.pull_request.author_association
+```
+
+If the author is a member or collaborator, it creates the output:
 
 ```text
 is_member_or_collaborator=true
 ```
 
+This output is then used by the next job.
+
 ---
 
 ### Job 2: `check_maintainer`
 
-This job runs only if the previous job confirms that the PR author is a member or collaborator.
+The `check_maintainer` job runs only when the previous job confirms that the PR author is a member or collaborator.
 
-It uses a **reusable workflow**:
+It uses a **reusable GitHub Actions workflow**:
 
-```text
-react/react/.github/workflows/shared_check_maintainer.yml@main
+```yaml
+uses: react/react/.github/workflows/shared_check_maintainer.yml@main
 ```
 
-The purpose is to check whether the PR author belongs to the **core/maintainer team**.
+It passes the PR author's GitHub username to the reusable workflow:
+
+```yaml
+with:
+  actor: ${{ github.event.pull_request.user.login }}
+```
+
+The reusable workflow appears to determine whether the user belongs to the **core/maintainer team**.
 
 ---
 
 ### Job 3: `notify`
 
-This job runs only when the `check_maintainer` job determines that the user is part of the core team.
+The `notify` job runs only when the previous job returns:
 
-It uses the Discord Webhook Action to send a notification to Discord.
+```text
+is_core_team=true
+```
 
-The notification contains information such as:
+It then sends a notification to **Discord** using the Discord Webhook Action:
+
+```yaml
+uses: tsickert/discord-webhook@86dc739f3f165f16dadc5666051c367efa1692f4
+```
+
+The Discord notification contains:
 
 * PR author
+* Author profile URL
+* Author avatar
 * PR number
-* PR title
 * Number of additions
 * Number of deletions
+* PR title
 * PR description
 * PR URL
 
 ---
 
-## 3. What does the workflow do?
+## 4. Overall Workflow
 
-### Best Guess
-
-The workflow is used to **notify a Discord channel when a core team member opens or reopens a Pull Request related to the Compiler project**.
-
-The overall flow is:
+The workflow can be understood as:
 
 ```text
-Pull Request
-     |
-     v
-check_access
-     |
-     |-- Is author a MEMBER/COLLABORATOR?
-     |
-     v
-check_maintainer
-     |
-     |-- Is author part of the core team?
-     |
-     v
-notify
-     |
-     v
-Send PR details to Discord
+Pull Request opened / ready for review
+                 |
+                 v
+        Is it a draft PR?
+                 |
+          No     |     Yes
+          |             |
+          v             X
+    check_access
+          |
+          v
+ Is author MEMBER or
+    COLLABORATOR?
+          |
+      Yes |
+          v
+  check_maintainer
+          |
+          v
+ Is author part of
+   core team?
+          |
+      Yes |
+          v
+       notify
+          |
+          v
+   Send PR details
+      to Discord
 ```
 
-## Summary
+---
 
-| Question                    | Answer                                                         |
-| --------------------------- | -------------------------------------------------------------- |
-| **What triggers it?**       | Pull Request opened or marked ready for review                 |
-| **How many jobs?**          | 3                                                              |
-| **Jobs**                    | `check_access`, `check_maintainer`, `notify`                   |
-| **Main purpose**            | Check PR author permissions/team membership and notify Discord |
-| **Notification platform**   | Discord                                                        |
-| **Reusable workflow used?** | Yes, `shared_check_maintainer.yml`                             |
+## 5. What does it do? — Best Guess
 
+The workflow is designed to **notify a Discord channel when an eligible core-team member opens or marks a Compiler-related Pull Request as ready for review**.
 
+It first verifies the author's repository association, then checks whether the author belongs to the core/maintainer team, and finally sends the Pull Request information to Discord.
 
+---
+
+## 6. Summary
+
+| Question                  | Answer                                                    |
+| ------------------------- | --------------------------------------------------------- |
+| **What triggers it?**     | Pull Request opened or marked ready for review            |
+| **Event type**            | `pull_request_target`                                     |
+| **Path filters**          | `compiler/**` and `.github/workflows/compiler_**.yml`     |
+| **How many jobs?**        | 3                                                         |
+| **Job 1**                 | `check_access`                                            |
+| **Job 2**                 | `check_maintainer`                                        |
+| **Job 3**                 | `notify`                                                  |
+| **Main purpose**          | Check PR author access/team membership and notify Discord |
+| **Notification platform** | Discord                                                   |
+| **Reusable workflow**     | `shared_check_maintainer.yml`                             |
+| **External action**       | `tsickert/discord-webhook`                                |
