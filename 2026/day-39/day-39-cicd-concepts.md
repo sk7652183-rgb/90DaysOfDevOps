@@ -314,4 +314,123 @@ Deploy Stage
 <img width="415" height="620" alt="image" src="https://github.com/user-attachments/assets/2ec6fceb-6904-4712-b4db-ecfa0a14530f" />
 
 
+## Task 5: Explore in the Wild
+
+# GitHub Actions Workflow Analysis
+
+## Workflow
+
+**Workflow Name:** `(Compiler) Discord Notify`
+
+## 1. What triggers it?
+
+The workflow is triggered by a **Pull Request** using `pull_request_target`.
+
+It runs when a Pull Request is:
+
+* **Opened**
+* **Marked as ready for review**
+
+It only runs when the Pull Request contains changes in:
+
+* `compiler/**`
+* `.github/workflows/compiler_**.yml`
+
+---
+
+## 2. How many jobs does it have?
+
+The workflow contains **3 jobs**:
+
+1. `check_access`
+2. `check_maintainer`
+3. `notify`
+
+### Job 1: `check_access`
+
+This job checks whether the Pull Request author is a:
+
+* `MEMBER`
+* `COLLABORATOR`
+
+If the author is a member or collaborator, it sets the output:
+
+```text
+is_member_or_collaborator=true
+```
+
+---
+
+### Job 2: `check_maintainer`
+
+This job runs only if the previous job confirms that the PR author is a member or collaborator.
+
+It uses a **reusable workflow**:
+
+```text
+react/react/.github/workflows/shared_check_maintainer.yml@main
+```
+
+The purpose is to check whether the PR author belongs to the **core/maintainer team**.
+
+---
+
+### Job 3: `notify`
+
+This job runs only when the `check_maintainer` job determines that the user is part of the core team.
+
+It uses the Discord Webhook Action to send a notification to Discord.
+
+The notification contains information such as:
+
+* PR author
+* PR number
+* PR title
+* Number of additions
+* Number of deletions
+* PR description
+* PR URL
+
+---
+
+## 3. What does the workflow do?
+
+### Best Guess
+
+The workflow is used to **notify a Discord channel when a core team member opens or reopens a Pull Request related to the Compiler project**.
+
+The overall flow is:
+
+```text
+Pull Request
+     |
+     v
+check_access
+     |
+     |-- Is author a MEMBER/COLLABORATOR?
+     |
+     v
+check_maintainer
+     |
+     |-- Is author part of the core team?
+     |
+     v
+notify
+     |
+     v
+Send PR details to Discord
+```
+
+## Summary
+
+| Question                    | Answer                                                         |
+| --------------------------- | -------------------------------------------------------------- |
+| **What triggers it?**       | Pull Request opened or marked ready for review                 |
+| **How many jobs?**          | 3                                                              |
+| **Jobs**                    | `check_access`, `check_maintainer`, `notify`                   |
+| **Main purpose**            | Check PR author permissions/team membership and notify Discord |
+| **Notification platform**   | Discord                                                        |
+| **Reusable workflow used?** | Yes, `shared_check_maintainer.yml`                             |
+
+
 
