@@ -107,6 +107,9 @@ jobs:
 ### Write in your notes: Why would you pass outputs between jobs?
 We would pass outputs between jobs when one job needs to share information or a value with another job. For example, the first job can generate today’s date, and the second job can use that date.
 
+<img width="1365" height="725" alt="image" src="https://github.com/user-attachments/assets/644dd26c-4477-470e-aaf2-52a4e3c78eef" />
+
+
 ## Task 4: Conditionals
 
 ### In a workflow, add a step that runs only on the main branch, a step that runs only when the previous step fails, a job that runs only on push events and not on pull requests, and a step with continue-on-error: true to understand how it allows the workflow to continue even if that step fails.
@@ -148,6 +151,9 @@ jobs:
        run: echo "The previous step failed, but the job continued anyway!"
 
 ```
+
+<img width="1365" height="725" alt="image" src="https://github.com/user-attachments/assets/fc864375-9724-41d4-9952-8d168f3fca05" />
+
 
 ## Task 5: Putting It Together
 
@@ -205,3 +211,6 @@ jobs:
           echo "${{ github.event.head_commit.message }}"
 
 ```
+
+<img width="1365" height="722" alt="image" src="https://github.com/user-attachments/assets/2007e6b0-2aa1-49c5-9121-97022bb5e21f" />
+
