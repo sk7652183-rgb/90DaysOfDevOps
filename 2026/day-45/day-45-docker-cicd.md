@@ -214,9 +214,16 @@ jobs:
 
 ## Task 6: Pull and Run It
 
+On your local machine or cloud server, pull the Docker image you just pushed, run it, and confirm that it works successfully.
 
 
-<img width="1365" height="743" alt="image" src="https://github.com/user-attachments/assets/b13e8c2a-a833-4cfd-a588-44ff880f0d44" />
+<img width="1365" height="745" alt="image" src="https://github.com/user-attachments/assets/4775af1e-e77a-4ea7-bd52-c99df7beb558" />
 
-<img width="1365" height="181" alt="image" src="https://github.com/user-attachments/assets/7e174192-eb59-4e8c-b441-ab5caa38c104" />
+<img width="1365" height="727" alt="image" src="https://github.com/user-attachments/assets/a2401a13-0c96-477f-ad48-21fdd55731f2" />
+
+
+### Write in your notes: What is the full journey from git push to a running container?
+
+git push → GitHub Actions triggers → Docker image is built → Image is tagged → Image is pushed to Docker Hub → Server pulls the image → Container is started → Application is running.
+
 
