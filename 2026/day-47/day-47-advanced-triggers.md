@@ -32,4 +32,22 @@ Verify: Open a PR from a badly named branch — does the check fail?
 
 ## Write in your notes:
 
-### 
+### The cron expression for: every weekday at 9 AM IST - 0 9 * * 1-5
+
+### The cron expression for: first day of every month at midnight -  0 0 1 * *
+
+### Scheduled Workflow Limitations
+
+GitHub scheduled workflows may be delayed or skipped due to system load. In public repositories, scheduled workflows can also be automatically disabled after 60 days of inactivity.
+
+**Tip:** Avoid scheduling workflows exactly at the start of the hour to reduce potential delays.
+
+
+## Task 4: Path & Branch Filters
+
+Created .github/workflows/smart-triggers.yml:
+
+
+
+<img width="1362" height="721" alt="image" src="https://github.com/user-attachments/assets/df4af218-4657-4cac-9226-b8a790a254e2" />
+
