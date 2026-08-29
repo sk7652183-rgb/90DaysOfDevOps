@@ -178,12 +178,74 @@ jobs:
 
 <img width="1362" height="723" alt="image" src="https://github.com/user-attachments/assets/74d8c6fd-2f44-4740-bd30-f9454230400a" />
 
+<img width="1365" height="728" alt="image" src="https://github.com/user-attachments/assets/a5d21cf8-3d47-405b-95a1-b649ac3454d2" />
+
 ## Task 5: Main Branch Pipeline
 
 ### Created .github/workflows/main-pipeline.yml:
 
+```yaml
+
+name: Main-pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  # Job 1: Build and Test
+  build-test:
+    uses: ./.github/workflows/reusable-build-test.yml
+    with:
+      python_version: "3.12"
+      run_tests: true
+
+  # Job 2: Build and Push Docker Image
+  Docker_login:
+    needs: build-test
+    uses: ./.github/workflows/reusable-docker.yml
+    with:
+      image_name: shopping-app
+      tag: sha-${{ github.sha }}
+    secrets:
+      docker_token: ${{ secrets.DOCKER_TOKEN }}
+
+  # Job 3: Deploy
+  Deploy:
+    needs: Docker_login
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout the Code
+        uses: actions/checkout@v4
+
+      - name: Log Deployment
+        run: |
+          IMAGE_URL="${{ needs.Docker_login.outputs.image_url }}"
+
+          echo "Deploying image: ${IMAGE_URL} to production"
+```
 
 
-<img width="1365" height="728" alt="image" src="https://github.com/user-attachments/assets/a5d21cf8-3d47-405b-95a1-b649ac3454d2" />
+### The pipeline is triggered by a push to main, calls the reusable build-test workflow as Job 1, calls the reusable Docker workflow as Job 2 after Job 1 with latest and sha-<short-commit-hash> tags, and then runs the deploy job as Job 3 after Job 2 to print Deploying image: <image_url> to production, using the production environment with optional manual approval configured through repository environment protection rules.
+
+<img width="1365" height="726" alt="image" src="https://github.com/user-attachments/assets/846c845f-049f-4ea6-8b01-6e02aeb509c0" />
+
+<img width="1365" height="725" alt="image" src="https://github.com/user-attachments/assets/a291df97-7c8a-483f-96d1-efb0805cf44b" />
+
+<img width="1365" height="715" alt="image" src="https://github.com/user-attachments/assets/8e1758a4-0345-40fb-bf16-f58c1d990294" />
+
+<img width="1365" height="727" alt="image" src="https://github.com/user-attachments/assets/58a4d705-8c35-4449-8975-7106750b3d8f" />
+
+
+### Verify: Merge a PR to main — does it run tests → build Docker → deploy in sequence?
+
+<img width="1364" height="728" alt="image" src="https://github.com/user-attachments/assets/74d143ea-94bf-4708-b660-9d255f5e1fd8" />
+
+
+
 
 
