@@ -247,5 +247,18 @@ jobs:
 
 
 
+## Task 6: Scheduled Health Check
+
+### Created .github/workflows/health-check.yml:
+
+### Configured a scheduled GitHub Actions health-check workflow to run every 12 hours, with manual triggering support, which pulls the latest Docker image, runs the container in detached mode, waits 5 seconds, checks the health endpoint using curl, reports a pass/fail status based on the response, and finally stops and removes the container.
+
+
+<img width="1365" height="727" alt="image" src="https://github.com/user-attachments/assets/b22d1a3d-0783-44fc-80bd-486b3c7ee8b7" />
+
+
+## Task 7: Add Badges & Documentation
+
+### Add status badges for all your workflows to the repo README.md
 
 
