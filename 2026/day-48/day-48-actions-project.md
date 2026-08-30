@@ -265,6 +265,60 @@ jobs:
 
 [![Main-pipeline](https://github.com/sk7652183-rgb/shopping-app/actions/workflows/main-pipeline.yml/badge.svg)](https://github.com/sk7652183-rgb/shopping-app/actions/workflows/main-pipeline.yml)
 
+### Add a pipeline architecture diagram in your notes — draw (or describe) the flow
+
+                         ┌─────────────────┐
+                         │    Developer    │
+                         └────────┬────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    │                           │
+                PR Opened                   Merge to main
+                    │                           │
+                    ▼                           ▼
+             ┌──────────────┐           ┌──────────────┐
+             │ Build & Test │           │ Build & Test │
+             └──────┬───────┘           └──────┬───────┘
+                    │                           │
+                    ▼                           ▼
+             ┌──────────────┐           ┌─────────────────┐
+             │ PR Checks    │           │ Docker Build &  │
+             │    PASS      │           │      Push       │
+             └──────────────┘           └────────┬────────┘
+                                                  │
+                                                  ▼
+                                           ┌──────────────┐
+                                           │    Deploy    │
+                                           │  Production  │
+                                           └──────────────┘
+
+
+                    Every 12 Hours
+                          │
+                          ▼
+                  ┌──────────────┐
+                  │ Health Check │
+                  │ Docker Image │
+                  └──────┬───────┘
+                         │
+                         ▼
+                  ┌──────────────┐
+                  │ PASS / FAIL  │
+                  └──────────────┘
+
+### Fill in your notes: What would you add next? (Slack notifications? Multi-environment? Rollback?)
+
+```markdown
+## 🚀 Future Improvements
+
+The next improvements I would add to this CI/CD pipeline are:
+
+- 🔔 **Slack Notifications** — Send notifications for pipeline success, failure, and deployment status.
+- 🌍 **Multi-Environment Deployment** — Introduce Dev → Staging → Production environments with approval gates.
+- 🔄 **Automated Rollback** — Automatically roll back to the previous working Docker image if a production deployment or health check fails.
+- 🔐 **Security Scanning** — Integrate tools such as Trivy to scan Docker images for vulnerabilities before pushing them.
+- 📊 **Monitoring & Alerting** — Add Prometheus and Grafana for application and infrastructure monitoring.
+```
 
 
 
