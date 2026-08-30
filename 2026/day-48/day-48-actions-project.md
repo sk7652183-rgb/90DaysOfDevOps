@@ -261,4 +261,10 @@ jobs:
 
 ### Add status badges for all your workflows to the repo README.md
 
+[![Health Check](https://github.com/sk7652183-rgb/shopping-app/actions/workflows/health-check.yml/badge.svg)](https://github.com/sk7652183-rgb/shopping-app/actions/workflows/health-check.yml)
+
+[![Main-pipeline](https://github.com/sk7652183-rgb/shopping-app/actions/workflows/main-pipeline.yml/badge.svg)](https://github.com/sk7652183-rgb/shopping-app/actions/workflows/main-pipeline.yml)
+
+
+
 
