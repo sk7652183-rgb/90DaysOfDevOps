@@ -207,4 +207,29 @@ reduction via `apt-get purge` in the Dockerfile.
 
 ## Task 2: Enable GitHub's Built-in Secret Scanning
 
+### GitHub can automatically detect if someone pushes a secret (API key, token, password) to your repo.
+
+### Go to your repository → Settings → Code security and analysis, enable Secret scanning, and, if available, enable Push protection to block any push that contains a detected secret.
+
+## 🔐 Secret Scanning and Push Protection
+
+### What is the difference between Secret Scanning and Push Protection?
+
+- **Secret Scanning** detects exposed secrets, such as API keys, passwords, tokens, and AWS access keys, that have already been pushed to a repository. GitHub generates an alert when a supported secret is detected.
+
+- **Push Protection** prevents supported secrets from being pushed to the repository in the first place. If GitHub detects a secret during a push, the push is blocked before the secret reaches the repository.
+
+### What happens if GitHub detects a leaked AWS key in your repository?
+
+If GitHub detects a leaked AWS access key:
+
+1. GitHub creates a security alert for the exposed secret.
+2. The exposed AWS credentials should be immediately revoked or rotated.
+3. If **Push Protection** is enabled, GitHub can block the push before the AWS key is committed to the repository.
+4. The key should be removed from the application code and replaced with a secure solution, such as GitHub Secrets or AWS IAM roles.
+
+> **Best Practice:** Never store AWS access keys, passwords, API keys, or other sensitive credentials directly in your source code.
+
+## Task 3: Scan Dependencies for Known Vulnerabilities
+
 
