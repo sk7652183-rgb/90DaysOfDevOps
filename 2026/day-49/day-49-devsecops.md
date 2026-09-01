@@ -326,6 +326,25 @@ It is a good practice to limit workflow permissions because it follows the **pri
 
 ### Draw this diagram in your notes. You just built a DevSecOps pipeline — security is now part of your automation, not an afterthought.
 
+```yaml
+PR opened
+  → build & test
+  → dependency vulnerability check     ← NEW (Day 49)
+  → PR checks pass or fail
+
+Merge to main
+  → build & test
+  → Docker build
+  → Trivy image scan (fail on CRITICAL) ← NEW (Day 49)
+  → Docker push (only if scan passes)
+  → deploy
+
+Always active
+  → GitHub secret scanning              ← NEW (Day 49)
+  → push protection for secrets         ← NEW (Day 49)
+
+```
+
 ```mermaid
 flowchart TB
     subgraph pr["PR opened"]
