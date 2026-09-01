@@ -232,4 +232,123 @@ If GitHub detects a leaked AWS access key:
 
 ## Task 3: Scan Dependencies for Known Vulnerabilities
 
+### If your app uses packages (pip, npm, etc.), those packages might have known vulnerabilities.
+
+### This checks any new dependencies added in a pull request (PR) against a vulnerability database, and if a dependency contains a critical CVE, the PR check fails; to test it, open a PR that adds a package to your application and verify in the Actions tab that the dependency review workflow has run successfully.
+
+```yaml
+name: PR Checks
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+jobs:
+  build-test:
+    uses: ./.github/workflows/reusable-build-test.yml
+    with:
+      run_tests: true
+  pr-comment:
+    needs: build-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: PR Summary
+        run: |
+          echo "PR checks passed for branch: ${{ github.head_ref }}"
+      - name: Dependencies for Vulnerabilities
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: critical
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEP_REVIEW_TOKEN }}
+
+```
+
+### Verify: Does the dependency review show up as a check on your PR?
+
+<img width="1363" height="720" alt="image" src="https://github.com/user-attachments/assets/2a6dd597-ad38-4ee5-9f84-7a6b54fce862" />
+
+<img width="1359" height="717" alt="image" src="https://github.com/user-attachments/assets/03a0ae36-77ed-4b06-bd76-61e444ce9dae" />
+
+## Task 4: Add Permissions to Your Workflows
+
+### By default, workflows have broad permissions, so lock them down by adding the following block near the top of your workflow files, immediately after on:.
+
+```yaml
+name: PR Checks
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+jobs:
+  build-test:
+    uses: ./.github/workflows/reusable-build-test.yml
+    with:
+      run_tests: true
+  pr-comment:
+    needs: build-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: PR Summary
+        run: |
+          echo "PR checks passed for branch: ${{ github.head_ref }}"
+      - name: Dependencies for Vulnerabilities
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: critical
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEP_REVIEW_TOKEN }}
+
+```
+
+### Updated existing workflow files with a permissions block.
+
+### Write in your notes: Why is it a good practice to limit workflow permissions? What could go wrong if a compromised action has write access to your repo?
+
+It is a good practice to limit workflow permissions because it follows the **principle of least privilege**, reducing the potential damage if a workflow or action is compromised. If a compromised action has write access to the repository, it could modify or delete code, push malicious commits, alter workflows, access secrets, or potentially compromise the entire CI/CD pipeline.
+
+## Task 5: See the Full Secure Pipeline
+
+### Draw this diagram in your notes. You just built a DevSecOps pipeline — security is now part of your automation, not an afterthought.
+
+```mermaid
+flowchart TB
+    subgraph pr["PR opened"]
+        direction TB
+        A1[Build & test] --> A2["Dependency vulnerability check 🆕"]
+        A2 --> A3[PR checks pass or fail]
+    end
+
+    subgraph merge["Merge to main"]
+        direction TB
+        B1[Build & test] --> B2[Docker build]
+        B2 --> B3["Trivy image scan 🆕<br/><sub>fails on CRITICAL</sub>"]
+        B3 -->|scan passes| B4[Docker push]
+        B4 --> B5[Deploy]
+    end
+
+    subgraph always["Always active"]
+        direction LR
+        C1["GitHub secret scanning 🆕"]
+        C2["Push protection for secrets 🆕"]
+    end
+```
+
+
+
 
