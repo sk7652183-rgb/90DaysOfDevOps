@@ -16,6 +16,32 @@ Kubernetes is a Greek word meaning “helmsman” or “pilot” — the person 
 
 ## Task 2: Draw the Kubernetes Architecture
 
+
+```mermaid
+flowchart TB
+    kubectl["kubectl"]
+
+    subgraph CP["CONTROL PLANE"]
+        API["API Server"]
+        ETCD["etcd<br/>Cluster State"]
+        SCH["Scheduler"]
+        CM["Controller Manager"]
+    end
+
+    subgraph W1["WORKER NODE 1"]
+        K1["kubelet"]
+        P1["kube-proxy"]
+        C1["Container Runtime"]
+        POD1["Pods"]
+    end
+
+    subgraph W2["WORKER NODE 2"]
+        K2["kubelet"]
+        P2["kube-proxy"]
+        C2["Container Runtime"]
+        POD2["Pods"]
+    end
+
                  ┌──────────────────────────────┐
                  │         CONTROL PLANE        │
                  │                              │
