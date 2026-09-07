@@ -42,33 +42,6 @@ flowchart TB
         POD2["Pods"]
     end
 
-                 ┌──────────────────────────────┐
-                 │         CONTROL PLANE        │
-                 │                              │
-                 │  ┌──────────────┐            │
- kubectl ───────► │  │  API Server  │            │
-                 │  └──────┬───────┘            │
-                 │         │                    │
-                 │  ┌──────▼───────┐            │
-                 │  │     etcd     │            │
-                 │  │ Cluster State│            │
-                 │  └──────────────┘            │
-                 │                              │
-                 │  Scheduler                   │
-                 │  Controller Manager          │
-                 └──────────────┬───────────────┘
-                                │
-              ┌─────────────────┴─────────────────┐
-              │                                   │
-      ┌───────▼────────┐                 ┌────────▼───────┐
-      │   WORKER NODE  │                 │   WORKER NODE  │
-      │                │                 │                │
-      │    kubelet     │                 │    kubelet     │
-      │    kube-proxy  │                 │    kube-proxy  │
-      │    Pods        │                 │    Pods        │
-      │    containerd  │                 │    containerd  │
-      └────────────────┘                 └────────────────┘
-
   The Control Plane manages the cluster. API Server is the entry point, etcd stores cluster state, Scheduler assigns Pods to nodes, and Controller Manager maintains the desired state. Worker nodes run the applications, where kubelet manages Pods, kube-proxy handles networking, and the container runtime runs the containers.
 
 <img width="646" height="451" alt="image" src="https://github.com/user-attachments/assets/11c657bc-3c2f-45d2-8d5f-d686e8cd6ce1" />
