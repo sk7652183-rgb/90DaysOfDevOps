@@ -14,8 +14,24 @@ Kubernetes was created by Google engineers Joe Beda, Brendan Burns, and Craig Mc
 
 Kubernetes is a Greek word meaning “helmsman” or “pilot” — the person who steers a ship.
 
-## Task 2: Draw the Kubernetes Architecture
+## Task 2: Kubernetes Architecture
 
+Kubernetes consists of two main parts:
+
+### Control Plane
+
+- **API Server** – Entry point for all Kubernetes requests.
+- **etcd** – Stores the cluster state.
+- **Scheduler** – Assigns Pods to suitable Worker Nodes.
+- **Controller Manager** – Ensures the actual state matches the desired state.
+
+### Worker Node
+
+- **kubelet** – Communicates with the API Server and manages Pods.
+- **kube-proxy** – Handles networking and network rules.
+- **Container Runtime** – Runs containers using `containerd` or `CRI-O`.
+
+### Architecture Diagram
 
 ```mermaid
 flowchart TB
@@ -41,6 +57,19 @@ flowchart TB
         C2["Container Runtime"]
         POD2["Pods"]
     end
+
+    kubectl --> API
+    API --> ETCD
+    API --> SCH
+    API --> CM
+    API --> K1
+    API --> K2
+    K1 --> C1
+    K2 --> C2
+    C1 --> POD1
+    C2 --> POD2
+
+```
 
   The Control Plane manages the cluster. API Server is the entry point, etcd stores cluster state, Scheduler assigns Pods to nodes, and Controller Manager maintains the desired state. Worker nodes run the applications, where kubelet manages Pods, kube-proxy handles networking, and the container runtime runs the containers.
 
