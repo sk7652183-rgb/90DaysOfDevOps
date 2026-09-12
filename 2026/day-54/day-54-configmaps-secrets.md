@@ -419,3 +419,31 @@ worldubuntu@ip-172-31-6-80:~/k8s$
 ### Environment variables injected from a ConfigMap or Secret do not update automatically; they are set when the Pod starts, so the Pod must be restarted to pick up updated values.
 
 ### Verify: Yes, the volume-mounted value changed automatically from hello to world without restarting the Pod.
+
+## Task 7: Clean Up
+
+```bash
+
+ubuntu@ip-172-31-6-80:~$ kubectl delete pod app-config-pod db-secret-pod nginx-config-pod live-config-pod
+pod "app-config-pod" deleted from default namespace
+pod "db-secret-pod" deleted from default namespace
+pod "nginx-config-pod" deleted from default namespace
+pod "live-config-pod" deleted from default namespace
+ubuntu@ip-172-31-6-80:~$ kubectl delete configmap app-config nginx-config live-config
+configmap "app-config" deleted from default namespace
+configmap "nginx-config" deleted from default namespace
+configmap "live-config" deleted from default namespace
+ubuntu@ip-172-31-6-80:~$ kubectl delete secret db-credentials
+secret "db-credentials" deleted from default namespace
+ubuntu@ip-172-31-6-80:~$ kubectl get pods
+kubectl get configmaps
+kubectl get secrets
+NAME       READY   STATUS    RESTARTS   AGE
+dns-test   0/1     Unknown   0          32h
+NAME               DATA   AGE
+kube-root-ca.crt   1      5d9h
+No resources found in default namespace.
+ubuntu@ip-172-31-6-80:~$
+
+
+```
