@@ -787,3 +787,212 @@ Handling connection for 8080
 ### Verify: Can you see the WordPress setup page?
 
 <img width="1365" height="723" alt="image" src="https://github.com/user-attachments/assets/9e3ebd45-0032-4c74-90fd-0ca82cd8ad8f" />
+
+## Task 5: Test Self-Healing and Persistence
+
+### Delete a WordPress pod and watch the Deployment recreate it within seconds, refresh the site, then delete the MySQL pod using `kubectl delete pod mysql-0 -n capstone` and watch the StatefulSet recreate it; after MySQL recovers, refresh WordPress and verify that your blog post is still there.
+
+
+```bash
+
+ubuntu@ip-172-31-6-80:~$ kubectl get pods
+NAME                         READY   STATUS    RESTARTS      AGE
+mysql-0                      1/1     Running   2 (10m ago)   15h
+wordpress-7b866d9b66-2j9dh   1/1     Running   8 (10m ago)   15h
+wordpress-7b866d9b66-b5jxf   1/1     Running   8 (10m ago)   15h
+wordpress-c5c7dd955-v2bwv    0/1     Pending   0             15h
+ubuntu@ip-172-31-6-80:~$
+ubuntu@ip-172-31-6-80:~$ kubectl delete wordpress-7b866d9b66-b5jxf
+error: the server doesn't have a resource type "wordpress-7b866d9b66-b5jxf"
+ubuntu@ip-172-31-6-80:~$ kubectl delete pod wordpress-7b866d9b66-b5jxf
+pod "wordpress-7b866d9b66-b5jxf" deleted from capstone namespace
+ubuntu@ip-172-31-6-80:~$ kubectl get pods
+NAME                         READY   STATUS    RESTARTS      AGE
+mysql-0                      1/1     Running   2 (11m ago)   15h
+wordpress-7b866d9b66-2j9dh   1/1     Running   8 (11m ago)   15h
+wordpress-7b866d9b66-bnhp8   0/1     Pending   0             5s
+wordpress-c5c7dd955-v2bwv    0/1     Running   0             15h
+ubuntu@ip-172-31-6-80:~$ kubectl delete pod mysql-0
+pod "mysql-0" deleted from capstone namespace
+ubuntu@ip-172-31-6-80:~$ kubectl get pods
+NAME                         READY   STATUS    RESTARTS      AGE
+mysql-0                      0/1     Pending   0             3s
+wordpress-7b866d9b66-2j9dh   1/1     Running   8 (12m ago)   15h
+wordpress-c5c7dd955-ndvrd    0/1     Running   0             90s
+wordpress-c5c7dd955-v2bwv    1/1     Running   0             15h
+ubuntu@ip-172-31-6-80:~$ kubectl get pods
+NAME                         READY   STATUS    RESTARTS      AGE
+mysql-0                      0/1     Pending   0             32s
+wordpress-7b866d9b66-2j9dh   0/1     Running   9 (5s ago)    15h
+wordpress-c5c7dd955-ndvrd    0/1     Running   0             119s
+wordpress-c5c7dd955-v2bwv    0/1     Running   1 (10s ago)   15h
+ubuntu@ip-172-31-6-80:~$ kubectl get pods
+NAME                         READY   STATUS    RESTARTS      AGE
+mysql-0                      0/1     Pending   0             54s
+wordpress-7b866d9b66-2j9dh   0/1     Running   9 (27s ago)   15h
+wordpress-c5c7dd955-ndvrd    0/1     Running   0             2m21s
+wordpress-c5c7dd955-v2bwv    0/1     Running   1 (32s ago)   15h
+ubuntu@ip-172-31-6-80:~$
+ubuntu@ip-172-31-6-80:~$
+ubuntu@ip-172-31-6-80:~$ kubectl descibe pod mysql-0
+error: unknown command "descibe" for "kubectl"
+
+Did you mean this?
+        describe
+ubuntu@ip-172-31-6-80:~$ kubectl delete pod wordpress-c5c7dd955-v2bwv
+pod "wordpress-c5c7dd955-v2bwv" deleted from capstone namespace
+ubuntu@ip-172-31-6-80:~$ kubectl get pods
+NAME                         READY   STATUS    RESTARTS       AGE
+mysql-0                      1/1     Running   0              2m14s
+wordpress-7b866d9b66-2j9dh   0/1     Running   10 (47s ago)   15h
+wordpress-c5c7dd955-fdmt2    0/1     Pending   0              5s
+wordpress-c5c7dd955-ndvrd    0/1     Running   2 (13s ago)    3m41s
+ubuntu@ip-172-31-6-80:~$
+
+```
+
+<img width="1365" height="767" alt="image" src="https://github.com/user-attachments/assets/aaacf3b2-db52-4aa7-aeee-4cc46aebf0d1" />
+
+### Verification
+
+After deleting both the WordPress and MySQL pods, the blog post was still available, confirming that the WordPress data persisted successfully.
+
+## Task 6: Set Up HPA (Day 58)
+
+### Create and apply an HPA manifest targeting the WordPress Deployment with CPU utilisation at 50%, a minimum of 2 and maximum of 10 replicas, verify it using kubectl get hpa -n capstone, and run kubectl get all -n capstone to view the complete picture.
+
+```bash
+ubuntu@ip-172-31-6-80:~$ ls
+Ecommerce-Website  custom-values.yaml  day_60  get_helm.sh  k8s  my-app
+ubuntu@ip-172-31-6-80:~$ cd day_60/
+ubuntu@ip-172-31-6-80:~/day_60$ ls
+db_secrets.yaml  service.yaml  statefulset.yaml  wordpress-config.yaml  wordpress-deployment.yaml  wordpress-service.yaml
+ubuntu@ip-172-31-6-80:~/day_60$ vim wordpress_hpa.yaml
+ubuntu@ip-172-31-6-80:~/day_60$
+ubuntu@ip-172-31-6-80:~/day_60$ kubectl apply -f wordpress_hpa.yaml
+horizontalpodautoscaler.autoscaling/wordpress-hpa created
+ubuntu@ip-172-31-6-80:~/day_60$ ubectl get hpa -n capstone
+Command 'ubectl' not found, did you mean:
+  command 'usectl' from snap usectl (2.12.0)
+  command 'kubectl' from snap kubectl (1.35.9)
+See 'snap info <snapname>' for additional versions.
+ubuntu@ip-172-31-6-80:~/day_60$ kubectl get hpa -n capstone
+NAME            REFERENCE              TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+wordpress-hpa   Deployment/wordpress   cpu: 1%/50%   2         10        2          22s
+ubuntu@ip-172-31-6-80:~/day_60$ kubectl get all -n capstone
+NAME                             READY   STATUS    RESTARTS         AGE
+pod/mysql-0                      1/1     Running   0                11m
+pod/wordpress-7b866d9b66-2j9dh   1/1     Running   10 (9m33s ago)   15h
+pod/wordpress-c5c7dd955-fdmt2    0/1     Pending   0                8m51s
+pod/wordpress-c5c7dd955-ndvrd    1/1     Running   2 (8m59s ago)    12m
+
+NAME                        TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+service/mysql-headless      ClusterIP   None           <none>        3306/TCP       16h
+service/wordpress-service   NodePort    10.96.66.162   <none>        80:30080/TCP   15h
+
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/wordpress   2/2     2            2           15h
+
+NAME                                   DESIRED   CURRENT   READY   AGE
+replicaset.apps/wordpress-7b866d9b66   1         1         1       15h
+replicaset.apps/wordpress-c5c7dd955    2         2         1       15h
+
+NAME                     READY   AGE
+statefulset.apps/mysql   1/1     16h
+
+NAME                                                REFERENCE              TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/wordpress-hpa   Deployment/wordpress   cpu: 1%/50%   2         10        2          49s
+ubuntu@ip-172-31-6-80:~/day_60$
+
+```
+
+### **Verified:** The HPA shows the correct target CPU utilisation of **50%**, with a minimum of **2** and a maximum of **10** replicas.
+
+
+## Task 7: (Bonus) Compare with Helm (Day 59)
+
+### Install WordPress using helm install wp-helm bitnami/wordpress in a separate namespace
+
+```bash
+ubuntu@ip-172-31-6-80:~$ kubectl get all
+NAME                                     READY   STATUS    RESTARTS   AGE
+pod/wp-helm-mariadb-0                    0/1     Pending   0          3m45s
+pod/wp-helm-wordpress-86f86b76f9-6gf7m   0/1     Pending   0          3m45s
+
+NAME                               TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)                      AGE
+service/wp-helm-mariadb            ClusterIP      10.96.19.136   <none>        3306/TCP                     3m45s
+service/wp-helm-mariadb-headless   ClusterIP      None           <none>        3306/TCP                     3m45s
+service/wp-helm-wordpress          LoadBalancer   10.96.70.125   <pending>     80:30622/TCP,443:32625/TCP   3m45s
+
+NAME                                READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/wp-helm-wordpress   0/1     1            0           3m45s
+
+NAME                                           DESIRED   CURRENT   READY   AGE
+replicaset.apps/wp-helm-wordpress-86f86b76f9   1         1         0       3m45s
+
+NAME                               READY   AGE
+statefulset.apps/wp-helm-mariadb   0/1     3m45s
+ubuntu@ip-172-31-6-80:~$
+```
+
+### Compare: how many resources did each approach create? Which gives more control?
+
+The manual approach creates only the Kubernetes resources explicitly defined in the YAML manifests, while Helm can create multiple resources automatically through its chart templates; the manual YAML approach generally provides more direct control over each resource and its configuration.
+
+### Clean up the Helm deployment
+
+```bash
+
+ubuntu@ip-172-31-6-80:~$ helm list
+NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
+wp-helm wordpress       1               2026-09-29 09:33:19.623899194 +0000 UTC deployed        wordpress-34.0.3        7.1.1
+ubuntu@ip-172-31-6-80:~$ helm uninstall wp-helm
+release "wp-helm" uninstalled
+ubuntu@ip-172-31-6-80:~$ helm list
+NAME    NAMESPACE       REVISION        UPDATED STATUS  CHART   APP VERSION
+ubuntu@ip-172-31-6-80:~$
+
+```
+
+## Task 8: Clean Up and Reflect
+
+### ### Task 8: Clean Up and Reflect
+
+Take a final look using `kubectl get all -n capstone`, review the twelve concepts used — Namespace, Secret, ConfigMap, PVC, StatefulSet, Headless Service, Deployment, NodePort Service, Resource Limits, Probes, HPA, and Helm — then delete the namespace with `kubectl delete namespace capstone` and reset the default namespace using `kubectl config set-context --current --namespace=default`.
+
+```bash
+
+ubuntu@ip-172-31-6-80:~$ kubectl get all -n capstone
+NAME                             READY   STATUS    RESTARTS       AGE
+pod/load-generator               1/1     Running   0              28m
+pod/mysql-0                      1/1     Running   0              44m
+pod/wordpress-7b866d9b66-2j9dh   1/1     Running   10 (42m ago)   16h
+pod/wordpress-c5c7dd955-fdmt2    0/1     Pending   0              41m
+pod/wordpress-c5c7dd955-ndvrd    1/1     Running   2 (42m ago)    45m
+
+NAME                        TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+service/mysql-headless      ClusterIP   None           <none>        3306/TCP       16h
+service/wordpress-service   NodePort    10.96.66.162   <none>        80:30080/TCP   15h
+
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/wordpress   2/2     2            2           16h
+
+NAME                                   DESIRED   CURRENT   READY   AGE
+replicaset.apps/wordpress-7b866d9b66   1         1         1       16h
+replicaset.apps/wordpress-c5c7dd955    2         2         1       16h
+
+NAME                     READY   AGE
+statefulset.apps/mysql   1/1     16h
+
+NAME                                                REFERENCE              TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/wordpress-hpa   Deployment/wordpress   cpu: 1%/50%   2         10        2          33m
+ubuntu@ip-172-31-6-80:~$ kubectl delete namespace capstone
+namespace "capstone" deleted
+ubuntu@ip-172-31-6-80:~$ kubectl config set-context --current --namespace=default
+Context "kind-devops-cluster" modified.
+ubuntu@ip-172-31-6-80:~$
+ubuntu@ip-172-31-6-80:~$
+```
+
+**Verified:** Deleting the `capstone` namespace successfully removed all the resources within it.
+
