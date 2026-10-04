@@ -1474,3 +1474,7 @@ ubuntu@ip-172-31-16-197:~/terraform-basics$
 
 ### Verify in the AWS console -- both the S3 bucket and EC2 instance should be gone
 <img width="1365" height="767" alt="image" src="https://github.com/user-attachments/assets/9605bf59-3a05-48f4-89b4-ed5f46beaafd" />
+
+<img width="1365" height="726" alt="image" src="https://github.com/user-attachments/assets/d90183e2-ad72-47ca-a08f-3b71de08d4da" />
+
+
